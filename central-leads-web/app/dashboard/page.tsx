@@ -66,7 +66,7 @@ export default async function DashboardPage() {
           <div className="flex items-center gap-3">
             {/* Botão Novo Usuário */}
             <Link 
-              href="/dashboard/register" 
+              href="/register" 
               className="hidden sm:flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
             >
               <UserPlus className="h-4 w-4" />

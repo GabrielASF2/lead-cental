@@ -2,7 +2,8 @@
 
 import { useFormState, useFormStatus } from 'react-dom'
 import { loginAction } from './actions'
-import { KeyRound, Mail, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { KeyRound, Mail, Loader2, UserPlus } from 'lucide-react'
 
 // Componente do Botão para mostrar "Carregando..."
 function SubmitButton() {
@@ -70,6 +71,16 @@ export default function LoginPage() {
 
           <SubmitButton />
         </form>
+
+        <div className="mt-6 pt-6 border-t border-slate-200">
+          <Link
+            href="/register"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200"
+          >
+            <UserPlus className="h-4 w-4" />
+            Criar Novo Usuário
+          </Link>
+        </div>
 
       </div>
     </div>
