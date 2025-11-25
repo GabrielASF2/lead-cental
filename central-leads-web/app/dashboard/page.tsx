@@ -1,8 +1,9 @@
 import { supabaseAdmin } from '@/lib/supabase'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { LogOut, MessageCircle, Mail, Package } from 'lucide-react'
-import { logoutAction } from '@/app/login/actions' // Vamos criar isso abaixo rapidinho
+import Link from 'next/link'
+import { LogOut, MessageCircle, Mail, Package, UserPlus } from 'lucide-react'
+import { logoutAction } from '@/app/login/actions'
 
 // Tipo do Lead
 interface Lead {
@@ -62,18 +63,27 @@ export default async function DashboardPage() {
             </div>
             <h1 className="text-xl font-bold text-slate-800">Central de Leads</h1>
           </div>
-          
-          <form action={logoutAction}>
-            <button className="flex items-center gap-2 text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors">
-              <LogOut className="h-4 w-4" />
-              Sair
-            </button>
-          </form>
+          <div className="flex items-center gap-3">
+            {/* Botão Novo Usuário */}
+            <Link 
+              href="/dashboard/register" 
+              className="hidden sm:flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+            >
+              <UserPlus className="h-4 w-4" />
+              Novo Usuário
+            </Link>
+
+            <form action={logoutAction}>
+              <button className="flex items-center gap-2 text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors">
+                <LogOut className="h-4 w-4" />
+                Sair
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
         {/* KPI Simples */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
@@ -98,7 +108,6 @@ export default async function DashboardPage() {
               <tbody className="divide-y divide-slate-100">
                 {leads?.map((lead: Lead) => (
                   <tr key={lead.id} className="hover:bg-slate-50 transition-colors group">
-                    
                     {/* Data */}
                     <td className="px-6 py-4 whitespace-nowrap text-slate-500">
                       {formatDate(lead.created_at)}
@@ -129,12 +138,12 @@ export default async function DashboardPage() {
 
                     {/* Interesse e Produto */}
                     <td className="px-6 py-4">
-                       <div className="text-slate-900 font-medium">{lead.interest}</div>
-                       {lead.produto && (
-                         <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded mt-1 inline-block">
-                           {lead.produto}
-                         </span>
-                       )}
+                      <div className="text-slate-900 font-medium">{lead.interest}</div>
+                      {lead.produto && (
+                        <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded mt-1 inline-block">
+                          {lead.produto}
+                        </span>
+                      )}
                     </td>
 
                     {/* Campanha */}
@@ -153,9 +162,9 @@ export default async function DashboardPage() {
             </table>
 
             {(!leads || leads.length === 0) && (
-               <div className="p-12 text-center text-slate-400">
-                 Nenhum lead encontrado no banco de dados.
-               </div>
+              <div className="p-12 text-center text-slate-400">
+                Nenhum lead encontrado no banco de dados.
+              </div>
             )}
           </div>
         </div>
