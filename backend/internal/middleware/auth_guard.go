@@ -29,6 +29,11 @@ func AuthGuard() gin.HandlerFunc {
 			return
 		}
 
+		// Injeta claims no contexto para uso nos handlers
+		if claims, ok := token.Claims.(jwt.MapClaims); ok {
+			c.Set("claims", claims)
+		}
+
 		c.Next()
 	}
 }

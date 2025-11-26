@@ -3,6 +3,7 @@ package user
 import (
 	"database/sql"
 	"errors"
+	"lead-central/pkg/crypto"
 )
 
 type Repository struct {
@@ -32,5 +33,70 @@ func (r *Repository) GetByEmail(email string) (*User, error) {
 		}
 		return nil, err
 	}
+	return u, nil
+}
+
+func (r *Repository) UpdateSupabaseConfig(userId string, req ConfigureSupabaseRequest) error {
+	// Criptografa a chave
+	encryptedKey, err := crypto.Encrypt(req.SupabaseAnonKey)
+	if err != nil {
+		return err
+	}
+
+	// Se não passou nome da tabela, usa "leads" como padrão
+	tableName := req.TableName
+	if tableName == "" {
+		tableName = "leads"
+	}
+
+	// Atualiza configuração do Supabase no usuário
+	query := `UPDATE users 
+              SET supabase_url = $1, 
+                  supabase_anon_key = $2,
+                  leads_table_name = $3,
+                  leads_schema = $4,
+                  supabase_configured = true,
+                  schema_detected_at = NOW()
+              WHERE id = $5`
+
+	_, err = r.DB.Exec(query,
+		req.SupabaseUrl,
+		encryptedKey,
+		tableName,
+		req.Schema,
+		userId,
+	)
+	return err
+}
+
+func (r *Repository) GetSupabaseConfig(userId string) (*User, error) {
+	u := &User{}
+
+	// 1️⃣ Busca APENAS campos do Supabase (não precisa de senha, etc)
+	query := `SELECT supabase_url, supabase_anon_key, leads_table_name, leads_schema
+              FROM users 
+              WHERE id = $1 AND supabase_configured = true`
+
+	var encryptedKey string
+
+	// 2️⃣ Faz SELECT
+	err := r.DB.QueryRow(query, userId).Scan(
+		&u.SupabaseUrl,    // URL do Supabase do cliente
+		&encryptedKey,     // Key criptografada
+		&u.LeadsTableName, // Nome da tabela
+		&u.LeadsSchema,    // Schema JSON
+	)
+
+	if err != nil {
+		return nil, err // Não configurou ainda ou não existe
+	}
+
+	// 3️⃣ Descriptografa a key
+	decryptedKey, err := crypto.Decrypt(encryptedKey)
+	if err != nil {
+		return nil, err
+	}
+	u.SupabaseAnonKey = &decryptedKey // Key descriptografada
+
 	return u, nil
 }
