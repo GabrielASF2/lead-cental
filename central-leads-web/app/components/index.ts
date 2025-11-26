@@ -14,7 +14,6 @@ export { AuthCard } from './AuthCard'
 // Specific Components
 export { WhatsAppButton } from './WhatsAppButton'
 
-// Table Components
-export { LeadsTable } from './LeadsTable'
-export type { Lead } from './LeadsTable'
+// Table Components (Dynamic - New)
+export { DynamicLeadsTable } from './DynamicLeadsTable'
 

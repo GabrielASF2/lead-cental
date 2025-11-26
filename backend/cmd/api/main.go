@@ -40,6 +40,7 @@ func main() {
 	// Conecta: Banco -> Repositório -> Handler
 	userRepo := user.NewRepository(db)
 	authHandler := &auth.Handler{Repo: userRepo}
+	userHandler := &user.Handler{Repo: userRepo}
 
 	// 4. Configuração do Servidor Web (Gin)
 	r := gin.Default()
@@ -75,16 +76,16 @@ func main() {
 	}
 
 	// Grupo Protegido (Requer Token JWT)
-	// Exemplo: Rotas administrativas para criar usuários no futuro
 	apiGroup := r.Group("/api")
 	apiGroup.Use(middleware.AuthGuard())
 	{
 		apiGroup.GET("/me", func(c *gin.Context) {
-			// Exemplo de como pegar dados do usuário logado (se você implementar extração no middleware)
 			c.JSON(200, gin.H{"message": "Você está autenticado e tem acesso a área restrita."})
 		})
 
-		// Aqui entraria: apiGroup.POST("/users", userHandler.Create)
+		// Configuração do Supabase
+		apiGroup.POST("/configure-supabase", userHandler.ConfigureSupabase)
+		apiGroup.GET("/user/supabase-config", userHandler.GetSupabaseConfig)
 	}
 
 	// 7. Inicialização do Servidor
